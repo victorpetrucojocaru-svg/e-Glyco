@@ -17,7 +17,6 @@ type Step = {
 
 type Recipe = {
   id: string;
-  slug: string;
   title_ro: string | null;
   description_ro: string | null;
   calories_per_serving: number | null;
@@ -48,6 +47,7 @@ export default function RecipePage({
     <div className="container">
       <h1>{recipe.title_ro}</h1>
       {recipe.description_ro && <p>{recipe.description_ro}</p>}
+
       <div
         className="card"
         style={{
@@ -56,6 +56,7 @@ export default function RecipePage({
           gap: 16,
         }}
       >
+        {/* Valori nutriționale */}
         <div>
           <h3>Valori nutriționale</h3>
           <ul>
@@ -67,6 +68,7 @@ export default function RecipePage({
           </ul>
         </div>
 
+        {/* Ingrediente */}
         <div>
           <h3>Ingrediente</h3>
           <ul>
@@ -78,6 +80,7 @@ export default function RecipePage({
           </ul>
         </div>
 
+        {/* Pași */}
         <div>
           <h3>Pași</h3>
           <ol>
@@ -94,18 +97,23 @@ export default function RecipePage({
 }
 
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
-  const slug = ctx.params?.id as string; // aici "id" din URL devine slug
+  const slug = ctx.params?.slug as string;
 
-  // Rețetă
+  // Rețeta după slug
   const { data: recipe } = await supabase
     .from("recipes")
     .select("*")
-    .eq("slug", slug) // schimbat din id -> slug
+    .eq("slug", slug) // căutăm după slug, nu după id
     .single();
 
+  // Dacă nu există rețeta
   if (!recipe) {
     return {
-      props: { recipe: null, ingredients: [], steps: [] },
+      props: {
+        recipe: null,
+        ingredients: [],
+        steps: [],
+      },
     };
   }
 
