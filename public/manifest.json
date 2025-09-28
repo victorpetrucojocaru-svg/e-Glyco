@@ -1,10 +1,10 @@
 {
-  "name": "Glyco",
+  "name": "e-Glyco",
   "short_name": "Glyco",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#0f172a",
+  "theme_color": "#16a34a",
   "icons": [
     {
       "src": "/icons/icon-192.png",

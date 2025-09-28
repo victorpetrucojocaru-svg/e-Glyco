@@ -1,0 +1,1 @@
+export default function About(){return <div className='container'><h1>Despre e-Glyco</h1><p>Aplicație PWA cu rețete pentru sănătate și stil de viață echilibrat.</p></div>;}

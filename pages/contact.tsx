@@ -1,0 +1,1 @@
+export default function Contact(){return <div className='container'><h1>Contact</h1><p>Ne poți scrie la <a href='mailto:e-glyco@gmail.com'>e-glyco@gmail.com</a>.</p></div>;}

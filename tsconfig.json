@@ -21,8 +21,7 @@
     "allowSyntheticDefaultImports": true,
     "strictNullChecks": true,
     "strictFunctionTypes": true,
-   "verbatimModuleSyntax": instead,
-    "noFallthroughCasesInSwitch": true,
+    "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "baseUrl": ".",
     "paths": {
