@@ -1,14 +1,12 @@
 import type { GetServerSideProps } from "next";
 import { supabase } from "@lib/supabaseClient";
 
-type Ingredient = { id: string; nume: string; cantitate: string | null; rețetă_id: string };
-type Step = { id: string; nr_pasă: number; text_ro: string | null; rețetă_id: string };
+type Ingredient = { id: string; recipe_id: string; name: string; quantity: string | null };
+type Step = { id: string; recipe_id: string; step_no: number; text_ro: string | null };
 type Recipe = {
   id: string;
   title_ro: string | null;
   description_ro: string | null;
-  category_slug: string | null;
-  subcategorie_slug: string | null;
   calories_per_serving: number | null;
   protein_grams: number | null;
   carbs_grams: number | null;
@@ -25,12 +23,13 @@ export default function RecipePage({
   ingredients: Ingredient[];
   steps: Step[];
 }) {
-  if (!recipe)
+  if (!recipe) {
     return (
       <div className="container">
         <p>Rețetă negăsită.</p>
       </div>
     );
+  }
 
   return (
     <div className="container">
@@ -54,21 +53,23 @@ export default function RecipePage({
             <li>Fibre: {recipe.fiber_grams ?? "—"} g</li>
           </ul>
         </div>
+
         <div>
           <h3>Ingrediente</h3>
           <ul>
             {ingredients.map((i) => (
               <li key={i.id}>
-                {i.nume} — {i.cantitate ?? ""}
+                {i.name} — {i.quantity ?? ""}
               </li>
             ))}
           </ul>
         </div>
+
         <div>
           <h3>Pași</h3>
           <ol>
             {steps
-              .sort((a, b) => a.nr_pasă - b.nr_pasă)
+              .sort((a, b) => a.step_no - b.step_no)
               .map((s) => (
                 <li key={s.id}>{s.text_ro}</li>
               ))}
@@ -82,25 +83,28 @@ export default function RecipePage({
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const id = ctx.params?.id as string;
 
+  // Tabel principal
   const { data: recipe } = await supabase
-    .from("rețete") // 🔹 tabelele cu diacritice
+    .from("recipes")
     .select("*")
     .eq("id", id)
     .single();
 
+  // Ingrediente (tabelul tău se numește recipe_ingredients)
   const { data: ingredients } = await supabase
-    .from("ingrediente_rețetă") // 🔹 tabelele cu diacritice
+    .from("recipe_ingredients")
     .select("*")
-    .eq("rețetă_id", id);
+    .eq("recipe_id", id);
 
+  // Pași (tabelul tău se numește recipe_steps)
   const { data: steps } = await supabase
-    .from("pași_rețetă") // 🔹 tabelele cu diacritice
+    .from("recipe_steps")
     .select("*")
-    .eq("rețetă_id", id);
+    .eq("recipe_id", id);
 
   return {
     props: {
-      recipe,
+      recipe: recipe ?? null,
       ingredients: ingredients ?? [],
       steps: steps ?? [],
     },
