@@ -21,25 +21,32 @@ export default function Recipes() {
   };
   const [data, setData] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   useEffect(() => {
     const run = async () => {
       if (!category && !subcategory) return;
       setLoading(true);
+      setErrorMsg(null);
+
+      console.log("🔎 Pornesc query cu:", { category, subcategory });
 
       let query = supabase
-        .from("recipes") // ✅ numele corect al tabelului
+        .from("recipes") // ✅ numele corect din Supabase
         .select("*")
         .order("created_at", { ascending: false })
         .limit(50);
 
       if (category) query = query.ilike("category_slug", category);
-      if (subcategory) query = query.ilike("subcategory_slug", subcategory); // ✅ corect
+      if (subcategory) query = query.ilike("subcategory_slug", subcategory);
 
       const { data, error } = await query;
+
       if (error) {
-        console.error("Supabase error:", error);
+        console.error("❌ Supabase error:", error);
+        setErrorMsg(error.message);
       } else {
+        console.log("✅ Supabase data:", data);
         setData(data as Recipe[]);
       }
 
@@ -55,9 +62,18 @@ export default function Recipes() {
         Rețete {category ? `— ${category}` : ""}{" "}
         {subcategory ? ` / ${subcategory}` : ""}
       </h1>
-      {loading ? (
-        <p>Se încarcă...</p>
-      ) : data.length > 0 ? (
+
+      {loading && <p>Se încarcă...</p>}
+      {errorMsg && (
+        <p style={{ color: "red" }}>
+          ❌ Eroare Supabase: {errorMsg}
+        </p>
+      )}
+      {!loading && !errorMsg && data.length === 0 && (
+        <p>Nu am găsit nicio rețetă.</p>
+      )}
+
+      {data.length > 0 && (
         <div className="grid">
           {data.map((r) => (
             <a key={r.id} className="card" href={`/recipes/${r.id}`}>
@@ -72,8 +88,6 @@ export default function Recipes() {
             </a>
           ))}
         </div>
-      ) : (
-        <p>Nu am găsit nicio rețetă.</p>
       )}
     </div>
   );
