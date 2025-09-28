@@ -28,13 +28,13 @@ export default function Recipes() {
       setLoading(true);
 
       let query = supabase
-        .from("rețete") // asigură-te că numele e exact ca în DB (ai "rețete" cu diacritice, nu "recipes")
+        .from("recipes") // ✅ numele corect al tabelului
         .select("*")
         .order("created_at", { ascending: false })
         .limit(50);
 
       if (category) query = query.ilike("category_slug", category);
-      if (subcategory) query = query.ilike("subcategorie_slug", subcategory);
+      if (subcategory) query = query.ilike("subcategory_slug", subcategory); // ✅ corect
 
       const { data, error } = await query;
       if (error) {
