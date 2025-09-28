@@ -1,8 +1,8 @@
 import type { GetServerSideProps } from "next";
 import { supabase } from "@lib/supabaseClient";
 
-type Ingredient = { id: string; name: string; quantity: string | null };
-type Step = { id: string; step_no: number; text_ro: string | null };
+type Ingredient = { id: string; nume: string; cantitate: string | null };
+type Step = { id: string; nr_pas: number; text_ro: string | null };
 type Recipe = {
   id: string;
   title_ro: string | null;
@@ -19,16 +19,17 @@ export default function RecipePage({
   ingredients,
   steps,
 }: {
-  recipe: Recipe;
+  recipe: Recipe | null;
   ingredients: Ingredient[];
   steps: Step[];
 }) {
-  if (!recipe)
+  if (!recipe) {
     return (
       <div className="container">
         <p>Rețetă negăsită.</p>
       </div>
     );
+  }
 
   return (
     <div className="container">
@@ -43,7 +44,7 @@ export default function RecipePage({
         }}
       >
         <div>
-          <h3>Valori</h3>
+          <h3>Valori nutriționale</h3>
           <ul>
             <li>Calorii: {recipe.calories_per_serving ?? "—"}</li>
             <li>Proteine: {recipe.protein_grams ?? "—"} g</li>
@@ -57,16 +58,16 @@ export default function RecipePage({
           <ul>
             {ingredients.map((i) => (
               <li key={i.id}>
-                {i.name} — {i.quantity ?? ""}
+                {i.nume} — {i.cantitate ?? ""}
               </li>
             ))}
           </ul>
         </div>
         <div>
-          <h3>Pași</h3>
+          <h3>Pași de preparare</h3>
           <ol>
             {steps
-              .sort((a, b) => a.step_no - b.step_no)
+              .sort((a, b) => a.nr_pas - b.nr_pas)
               .map((s) => (
                 <li key={s.id}>{s.text_ro}</li>
               ))}
@@ -80,25 +81,28 @@ export default function RecipePage({
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const id = ctx.params?.id as string;
 
+  // rețeta
   const { data: recipe } = await supabase
-    .from("recipes")
+    .from("rețete")
     .select("*")
     .eq("id", id)
     .single();
 
+  // ingrediente
   const { data: ingredients } = await supabase
-    .from("recipe_ingredients")
+    .from("ingrediente_rețetă")
     .select("*")
-    .eq("recipe_id", id);
+    .eq("rețetă_id", id);
 
+  // pași
   const { data: steps } = await supabase
-    .from("recipe_steps")
+    .from("pași_rețetă")
     .select("*")
-    .eq("recipe_id", id);
+    .eq("rețetă_id", id);
 
   return {
     props: {
-      recipe,
+      recipe: recipe ?? null,
       ingredients: ingredients ?? [],
       steps: steps ?? [],
     },
