@@ -1,18 +1,18 @@
 import type { GetServerSideProps } from "next";
 import { supabase } from "@lib/supabaseClient";
 
-type Ingredient = {
-  id: string;
-  recipe_id: string;
-  name: string;
-  quantity: string | null;
+type Ingredient = { 
+  id: string; 
+  recipe_id: string; 
+  name: string; 
+  quantity: string | null 
 };
 
-type Step = {
-  id: string;
-  recipe_id: string;
-  step_no: number;
-  text_ro: string | null;
+type Step = { 
+  id: string; 
+  recipe_id: string; 
+  step_no: number; 
+  text_ro: string | null 
 };
 
 type Recipe = {
@@ -96,38 +96,28 @@ export default function RecipePage({
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const slug = ctx.params?.slug as string;
 
-  // 1. Găsim rețeta după slug
+  // Tabel principal — acum căutăm după slug, nu după id
   const { data: recipe } = await supabase
     .from("recipes")
     .select("*")
     .eq("slug", slug)
     .single();
 
-  if (!recipe) {
-    return {
-      props: {
-        recipe: null,
-        ingredients: [],
-        steps: [],
-      },
-    };
-  }
-
-  // 2. Ingrediente
+  // Ingrediente
   const { data: ingredients } = await supabase
     .from("recipe_ingredients")
     .select("*")
-    .eq("recipe_id", recipe.id);
+    .eq("recipe_id", recipe?.id);
 
-  // 3. Pași
+  // Pași
   const { data: steps } = await supabase
     .from("recipe_steps")
     .select("*")
-    .eq("recipe_id", recipe.id);
+    .eq("recipe_id", recipe?.id);
 
   return {
     props: {
-      recipe,
+      recipe: recipe ?? null,
       ingredients: ingredients ?? [],
       steps: steps ?? [],
     },
