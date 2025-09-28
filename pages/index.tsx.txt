@@ -1,0 +1,84 @@
+import Image from "next/image";
+import Link from "next/link";
+
+export default function Home() {
+  return (
+    <div>
+      {/* HERO SECTION */}
+      <section style={{ textAlign: "center", padding: "40px" }}>
+        <Image
+          src="/cover.jpg"
+          alt="Familie fericită mâncând sănătos"
+          width={1200}
+          height={500}
+          style={{ borderRadius: "16px", margin: "0 auto" }}
+        />
+        <h1 style={{ marginTop: "20px", fontSize: "2.5rem", fontWeight: "bold" }}>
+          Rețete sănătoase pentru un stil de viață echilibrat
+        </h1>
+        <p style={{ fontSize: "1.2rem", color: "#555", marginBottom: "20px" }}>
+          Alege rețete potrivite pentru diabet, dislipidemie, anemie și multe alte afecțiuni.
+        </p>
+        <Link href="/login">
+          <button
+            style={{
+              backgroundColor: "#28a745",
+              color: "white",
+              border: "none",
+              padding: "15px 30px",
+              borderRadius: "8px",
+              fontSize: "1rem",
+              cursor: "pointer",
+            }}
+          >
+            Începe acum
+          </button>
+        </Link>
+      </section>
+
+      {/* CATEGORIES */}
+      <section style={{ padding: "40px" }}>
+        <h2 style={{ textAlign: "center", fontSize: "2rem", marginBottom: "30px" }}>
+          Categorii
+        </h2>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+            gap: "20px",
+          }}
+        >
+          {[
+            "Diabet",
+            "Dislipidemie",
+            "Boli digestive",
+            "Anemie",
+            "Boli hepatice",
+            "Hipertensiune arterială",
+          ].map((cat) => (
+            <div
+              key={cat}
+              style={{
+                border: "1px solid #ddd",
+                borderRadius: "12px",
+                padding: "20px",
+                textAlign: "center",
+              }}
+            >
+              <h3>{cat}</h3>
+              <ul style={{ listStyle: "none", padding: 0 }}>
+                {["Mic dejun", "Prânz", "Cină", "Gustări"].map((sub) => (
+                  <li key={sub}>
+                    <Link href={`/category/${cat.toLowerCase()}/${sub.toLowerCase()}`}>
+                      {sub}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
