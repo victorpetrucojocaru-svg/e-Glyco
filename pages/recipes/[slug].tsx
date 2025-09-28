@@ -17,6 +17,7 @@ type Step = {
 
 type Recipe = {
   id: string;
+  slug: string;
   title_ro: string | null;
   description_ro: string | null;
   calories_per_serving: number | null;
@@ -47,7 +48,6 @@ export default function RecipePage({
     <div className="container">
       <h1>{recipe.title_ro}</h1>
       {recipe.description_ro && <p>{recipe.description_ro}</p>}
-
       <div
         className="card"
         style={{
@@ -56,7 +56,6 @@ export default function RecipePage({
           gap: 16,
         }}
       >
-        {/* Valori nutriționale */}
         <div>
           <h3>Valori nutriționale</h3>
           <ul>
@@ -68,7 +67,6 @@ export default function RecipePage({
           </ul>
         </div>
 
-        {/* Ingrediente */}
         <div>
           <h3>Ingrediente</h3>
           <ul>
@@ -80,7 +78,6 @@ export default function RecipePage({
           </ul>
         </div>
 
-        {/* Pași */}
         <div>
           <h3>Pași</h3>
           <ol>
@@ -99,14 +96,13 @@ export default function RecipePage({
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   const slug = ctx.params?.slug as string;
 
-  // Rețeta după slug
+  // 1. Găsim rețeta după slug
   const { data: recipe } = await supabase
     .from("recipes")
     .select("*")
-    .eq("slug", slug) // căutăm după slug, nu după id
+    .eq("slug", slug)
     .single();
 
-  // Dacă nu există rețeta
   if (!recipe) {
     return {
       props: {
@@ -117,13 +113,13 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
     };
   }
 
-  // Ingrediente
+  // 2. Ingrediente
   const { data: ingredients } = await supabase
     .from("recipe_ingredients")
     .select("*")
     .eq("recipe_id", recipe.id);
 
-  // Pași
+  // 3. Pași
   const { data: steps } = await supabase
     .from("recipe_steps")
     .select("*")
@@ -131,7 +127,7 @@ export const getServerSideProps: GetServerSideProps = async (ctx) => {
 
   return {
     props: {
-      recipe: recipe ?? null,
+      recipe,
       ingredients: ingredients ?? [],
       steps: steps ?? [],
     },
